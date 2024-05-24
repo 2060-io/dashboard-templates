@@ -1,0 +1,146 @@
+## Example file
+version: 1.0
+optionManage:
+  - type: user-manage
+    id: ENABLED_AVAILABLE_CMD
+    key: /help
+  - type: user-manage
+    id: ENABLED_AVAILABLE_CMD
+    key: /continue
+  - type: user-manage
+    id: ENABLED_IDENTITY_PROOF
+    key: welcome
+    value: citizenId,firstname,lastname,birthdate,photo,citizenSince
+    nextStep: step_0
+  - type: user-manage
+    id: ENABLED_CREDENTIAL_TYPES
+    key: step_4
+    value:
+      name: test regional credential
+      version: 1.0
+      attributes:
+        - expired
+        - type_document
+        - document
+  - type: user-manage
+    id: ENABLED_INVITATION_CREDENTIAL
+    key: welcome
+    value:
+      type: invitation
+      label: Cédula Verificable 🇧🇴 (demo Segip)
+      imageUrl: https://q.bolivia.demos.2060.io/avatar.png
+      did: did:web:bolivia.demos.2060.io
+  - type: service-manage
+    id: ENABLED_STEP
+    key: welcome
+    item:
+      - type: text
+        content: Hello, welcome to the registration system for Mobiera SAS applicants
+      - type: text
+        content: Firstly, please send your email credential to begin the identity validation process
+      - type: identity-proof-request
+        requestedProofItems:
+          - type: verifiable-credential
+            credentialDefinitionId: did:web:bolivia.demos.2060.io?service=anoncreds&relativeRef=/credDef/Co5UrRrQnuovN5BapF74CUZPL7UxqeCqwPbtsJ9u6eJR
+            attributes:
+              - citizenId
+              - firstname
+              - lastname
+              - birthdate
+              - photo
+              - citizenSince
+  - type: service-manage
+    id: ENABLED_STEP
+    key: step_0
+    item:
+      - type: text
+        content: Please enter your name
+      - type: contextual-menu-update
+        title: Option menu
+        description: Press "continue" to continue the process
+        options:
+          - id: /help
+            title: help
+          - id: /continue
+            title: continue
+    save: true
+    confirm: true
+    response: text
+    nextStep: step_1
+  - type: service-manage
+    id: ENABLED_STEP
+    key: step_1
+    item:
+      - type: text
+        content: now please enter your last name
+      - type: contextual-menu-update
+        title: Option menu
+        description: Press "continue" to continue the process
+        options:
+          - id: /help
+            title: help
+          - id: /continue
+            title: continue
+    save: true
+    confirm: true
+    response: text
+    nextStep: step_2
+  - type: service-manage
+    id: ENABLED_STEP
+    key: step_2
+    item:
+      - type: contextual-menu-update
+        title: Option menu
+        description: Press "continue" to continue the process
+        options:
+          - id: /help
+            title: help
+          - id: /continue
+            title: continue
+      - type: menu-display
+        prompt: select your type of identity document
+        menuItems:
+          - id: cc
+            text: CC
+          - id: ti
+            text: TI
+          - id: ce
+            text: CE
+    save: true
+    confirm: true
+    nextStep: step_3
+  - type: service-manage
+    id: ENABLED_STEP
+    key: step_3
+    item:
+      - type: text
+        content: Please enter your ID without periods or commas
+      - type: contextual-menu-update
+        title: Option menu
+        description: Press "continue" to continue the process
+        options:
+          - id: /help
+            title: help
+          - id: /continue
+            title: continue
+    save: true
+    confirm: true
+    response: text
+    nextStep: step_4
+  - type: service-manage
+    id: ENABLED_STEP
+    key: step_4
+    item:
+      - type: credential-issuance
+        credentialDefinitionId:
+        claims:
+          - name: id
+            value:
+          - name: expired
+            value: 2592000
+          - name: type_document
+            value: step_2
+          - name: document
+            value: step_3
+          - name: issued
+            value:

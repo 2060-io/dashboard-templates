@@ -1,0 +1,344 @@
+#   dtst:name of variable in orchestrator:priority in variable form:what to replace
+# Namespace
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demos-main #dtst:namespace:10:demos-main
+  
+---
+
+# Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastbot-service #dtst:dtsName:1:fastbot-service
+  namespace: demos-main #dtst:namespace:10:demos-main
+spec:
+  selector:
+    app: fastbot-service #dtst:dtsName::fastbot-service
+  ports:
+  - name: didcomm
+    port: 3001
+    targetPort: 3001
+    protocol: TCP
+  - name: admin
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  - name: q
+    port: 2903
+    targetPort: 2903
+    protocol: TCP
+  - name: ds
+    port: 2904
+    targetPort: 2904
+    protocol: TCP
+  - name: artemis1
+    port: 8161
+    targetPort: 8161
+    protocol: TCP
+  - name: artemis2
+    port: 61616
+    targetPort: 61616
+    protocol: TCP
+  - name: artemis3
+    port: 5672
+    targetPort: 5672
+    protocol: TCP
+  - name: nginx
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+    protocol: TCP
+
+
+---
+
+
+# Ingress admin
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastbot-service-admin #dtst:dtsName:1:fastbot-service
+  namespace: demos-main #dtst:namespace:10:demos-main
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/whitelist-source-range: "198.50.185.225/32"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - a.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      secretName: admin.fastbot-service.demos.dev.2060.io-cert #dtst:dtsName:1:fastbot-service
+  rules:
+    - host: a.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 port:
+                   number: 3000
+
+---
+
+
+# Ingress public
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastbot-service-public #dtst:dtsName:1:fastbot-service
+  namespace: demos-main #dtst:namespace:10:demos-main
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+        - i.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      secretName: public.fastbot-service.demos.dev.2060.io-cert #dtst:dtsName:1:fastbot-service
+  rules:
+    - host: fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 port:
+                   number: 3001
+    - host: i.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 port:
+                   number: 80
+
+---
+
+# Ingress ds
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastbot-service-ds #dtst:dtsName:1:fastbot-service
+  namespace: demos-main #dtst:namespace:10:demos-main
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/whitelist-source-range: "51.79.89.27/32"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - q.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+        - d.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      secretName: ds-fastbot-service.demos.dev.2060.io-cert #dtst:dtsName:1:fastbot-service
+  rules:
+    - host: q.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 port:
+                   number: 2903
+    - host: d.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 port:
+                   number: 2904
+
+
+---
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+   name: fastbot-service #dtst:dtsName:1:fastbot-service
+   namespace: demos-main #dtst:namespace:10:demos-main
+   labels:
+      app: nginx
+spec:
+   serviceName: "fastbot-service" #dtst:dtsName::fastbot-service
+   replicas: 1 #dtst:replicas:0:1
+   selector:
+      matchLabels:
+         app: fastbot-service #dtst:dtsName::fastbot-service
+   template:
+      metadata:
+         labels:
+            app: fastbot-service #dtst:dtsName::fastbot-service
+      spec:
+         initContainers:
+         - name: volume-gid-ds
+           image: busybox
+           command: ["sh", "-c", "chown -R 185:0 /home/data"]
+           volumeMounts:
+           - name: fastbot-service-data-store-main #dtst:dtsName::fastbot-service
+             mountPath: /home/data
+         containers:
+         -  name: fastbot-service-sa-container #dtst:dtsName::fastbot-service
+            image: io2060/2060-service-agent:dev
+            imagePullPolicy: Always
+            env:
+            - name: AGENT_ENDPOINT
+              value: "wss://fastbot-service.demos.dev.2060.io:443" #dtst:dtsName:1:fastbot-service
+            - name: AGENT_NAME
+              value: "Modern Bank" #dtst:agentName:2:Modern Bank
+            - name: AGENT_INVITATION_IMAGE_URL
+              value: "https://i.fastbot-service.demos.dev.2060.io/avatar.png" #dtst:dtsName:1:fastbot-service
+            - name: EVENTS_BASE_URL
+              value: "http://localhost:2903"
+            - name: AGENT_PUBLIC_DID
+              value: "did:web:fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+            - name: ANONCREDS_SERVICE_BASE_URL
+              value: "https://fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+            volumeMounts:
+            - name: fastbot-service-sa-pv-main #dtst:dtsName:1:fastbot-service
+              mountPath: /root/.afj
+            ports:
+            -  containerPort: 3000
+            -  containerPort: 3001
+         -  name: fastbot-service-backend-container #dtst:dtsName:1:fastbot-service
+            image: io2060/fastbot-conversational-dts:dev
+            imagePullPolicy: Always
+            env:
+            - name: SERVICE_AGENT_ADMIN_BASE_URL
+              value: "http://localhost:3000"
+            - name: PUBLIC_BASE_URL
+              value: "https://fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+            - name: PNVS_SERVICE_AGENT_ADMIN_BASE_URL
+              value: "https://a.fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+            - name: DEBUG
+              value: "1"
+            - name: QUARKUS_HTTP_PORT
+              value: "2903"
+            - name: IO_TWENTYSIXTY_SA_RES_C_V1_MESSAGERESOURCE_MP_REST_URL
+              value: "http://localhost:3000"
+            - name: IO_TWENTYSIXTY_SA_RES_C_V1_CREDENTIALTYPERESOURCE_MP_REST_URL
+              value: "http://localhost:3000"
+            - name: COM_MOBIERA_CHATAPP_FASTBOT_RES_C_MEDIARESOURCE_MP_REST_URL
+              value: "http://localhost:2904"
+            - name: COM_MOBIERA_CHATAPP_FASTBOT_RES_C_MEDIARESOURCE_MP_REST_ENABLED
+              value: "false" #dtst:dtsMediaSt:1:false
+            - name: QUARKUS_SWAGGER_UI_ALWAYS_INCLUDE
+              value: "1"
+            - name: COM_MOBIERA_CHATAPP_FASTBOT_LANGUAGE
+              value: "en" #dtst:language:1:en
+            - name: COM_MOBIERA_CHATAPP_FASTBOT_JMS_QUEUE_ID
+              value: "fastbot" #dtst:queue:1:fastbot
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:postgresql://localhost/easychat
+            - name: QUARKUS_DATASOURCE_USERNAME
+              value: "easychat" 
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              value: "password" #dtst:dbPWD:1:password
+            - name: QUARKUS_ARTEMIS_USERNAME
+              value: "quarkus" 
+            - name: QUARKUS_ARTEMIS_PASSWORD
+              value: "password" #dtst:quarkusPWD:1:password
+            - name: IO_TWENTYSIXTY_DTS_ENTITY_ID
+              value: "6902dc8e-8d57-4506-8cf8-cf1fd527809c" #dtst:dtsId:1:6902dc8e-8d57-4506-8cf8-cf1fd527809c
+            - name: QUARKUS_ARTEMIS_URL
+              value: "tcp://artemis-broker-hdls-svc.activemq-artemis-operator:61616"
+            - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_REGISTERRESOURCE_MP_REST_URL
+              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+            - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_PARAMETERRESOURCE_MP_REST_URL
+              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+            - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_DTSRESOURCE_MP_REST_URL
+              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+            - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_CAMPAIGNRESOURCE_MP_REST_URL
+              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+            - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_CAMPAIGNSCHEDULERESOURCE_MP_REST_URL
+              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+            ports:
+            -  containerPort: 2903
+         -  name: fastbot-service-data-store-container #dtst:dtsName::fastbot-service
+            image: io2060/2060-datastore:main
+            imagePullPolicy: Always
+            env:
+            - name: DEBUG
+              value: "1"
+            - name: QUARKUS_HTTP_PORT
+              value: "2904"
+            - name: IO_TWENTYSIXTY_DATASTORE_TMP_DIR
+              value: "/home/data/tmp"
+            - name: IO_TWENTYSIXTY_DATASTORE_TMP_LIFETIMEDAYS
+              value: "5"
+            - name: IO_TWENTYSIXTY_DATASTORE_REPO_LIFETIMEDAYS
+              value: "43800"
+            - name: IO_TWENTYSIXTY_DATASTORE_REPO_FS_DIR
+              value: "/home/data/repo"
+            - name: IO_TWENTYSIXTY_DATASTORE_MEDIA_MAXCHUNKS
+              value: "128"
+            ports:
+            -  containerPort: 2904
+            volumeMounts:
+            - name: fastbot-service-data-store-main #dtst:dtsName::fastbot-service
+              mountPath: /home/data
+         -  name: postgres
+            image: postgres:15.2
+            imagePullPolicy: Always
+            env:
+            - name: POSTGRES_PASSWORD
+              value: "password" #dtst:dbPWD:1:password
+            - name: POSTGRES_USER
+              value: "easychat"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+            ports:
+            -  containerPort: 5432
+            volumeMounts:
+            - name: fastbot-service-pg-pv-main #dtst:dtsName::fastbot-service
+              mountPath: /var/lib/postgresql/data
+   volumeClaimTemplates:
+   - metadata:
+       name: fastbot-service-sa-pv-main #dtst:dtsName::fastbot-service
+     spec:
+       storageClassName: csi-cinder-classic
+       accessModes:
+       - "ReadWriteOnce"
+       resources:
+         requests:
+           storage: 1Gi
+   - metadata:
+       name: fastbot-service-pg-pv-main #dtst:dtsName::fastbot-service
+     spec:
+       storageClassName: csi-cinder-classic
+       accessModes:
+       - "ReadWriteOnce"
+       resources:
+         requests:
+           storage: 1Gi
+   - metadata:
+       name: fastbot-service-data-store-main #dtst:dtsName::fastbot-service
+     spec:
+       storageClassName: csi-cinder-classic
+       accessModes:
+       - "ReadWriteOnce"
+       resources:
+         requests:
+           storage: 1Gi

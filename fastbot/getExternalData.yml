@@ -1,0 +1,81 @@
+## Example file
+version: 1.0
+optionManage:
+  - type: user-manage
+    id: ENABLED_ENDPOINT_SETUP
+    key: step_0
+    item:
+      - type: media
+        description: id
+        items:
+          - title: name
+            description: creationAt
+            uri: image
+            mimeType: image/jpg
+      - type: text
+        content: creationAt
+    value:
+      url: https://api.escuelajs.co/api/v1/categories?limit=1
+      attributes:
+        - id
+        - name
+        - image
+        - creationAt
+        - updatedAt
+  - type: user-manage
+    id: ENABLED_AVAILABLE_CMD
+    key: /help
+    item:
+      - type: text
+        content: Don't forget that if you validate your identity you will be able to access our services
+  - type: user-manage
+    id: ENABLED_AVAILABLE_CMD
+    key: /reload
+  - type: user-manage
+    id: ENABLED_IDENTITY_PROOF
+    key: welcome
+    value: expired,type_document,document
+    nextStep: step_0
+  - type: user-manage
+    id: ENABLED_INVITATION_CREDENTIAL
+    key: welcome
+    value:
+      type: invitation
+      label: Credential (dev)
+      imageUrl: https://q.credential.demos.dev.2060.io/avatar.png
+      did: did:web:credential.demos.dev.2060.io
+  - type: service-manage
+    id: ENABLED_STEP
+    key: welcome
+    item:
+      - type: text
+        content: Hello, welcome to the informative news system, to receive your daily update please validate your identity
+      - type: contextual-menu-update
+        title: Option menu
+        description: Press "continue" to continue the process
+        options:
+          - id: /help
+            title: Help
+          - id: /reload
+            title: Continue
+      - type: identity-proof-request
+        requestedProofItems:
+          - type: verifiable-credential
+            credentialDefinitionId: did:web:credential.demos.dev.2060.io?service=anoncreds&relativeRef=/credDef/DbgrAvTfQFFHhSHxkVsGAFtCYNoxgcyVTzG6S2vxTo52
+            attributes:
+              - expired
+              - type_document
+              - document
+  - type: service-manage
+    id: ENABLED_STEP
+    key: step_0
+    item:
+      - type: text
+        content: Welcome, this is the news that happened today
+      - type: contextual-menu-update
+        title: Option menu
+        description: Press "Continue" to continue the process or "Return" to start again
+        options:
+          - id: /reload
+            title: Reaload news
+    endpoint: true

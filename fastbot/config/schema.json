@@ -1,0 +1,242 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Fastbot configuration file",
+    "type": "object",
+    "required": [
+      "version",
+      "optionManage"
+    ],
+    "properties": {
+      "version": {
+        "type": "integer",
+        "description": "Version of the chatbot to setup"
+      },
+      "optionManage": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/userManage"
+            },
+            {
+              "$ref": "#/definitions/serviceManage"
+            }
+          ]
+        },
+        "minItems": 1
+      }
+    },
+    "additionalProperties": false,
+    "definitions": {
+      "userManage": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "key"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "user-manage"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "enum": [
+              "ENABLED_AVAILABLE_CMD",
+              "ENABLED_IDENTITY_PROOF",
+              "ENABLED_CREDENTIAL_TYPES",
+              "ENABLED_INVITATION_CREDENTIAL",
+              "ENABLED_ENDPOINT_SETUP"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "nextStep": {
+            "type": "string"
+          },
+          "reWrite": {
+            "type": "boolean"
+          },
+          "value": {
+            "$ref": "#/definitions/valueSchema"
+          },
+          "item": {
+            "$ref": "#/definitions/itemSchema"
+          }
+        },
+        "additionalProperties": false
+      },
+      "serviceManage": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "key"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "service-manage"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "enum": [
+              "ENABLED_STEP"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "nextStep": {
+            "type": "string"
+          },
+          "save": {
+            "type": "boolean"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "response": {
+            "type": "string",
+            "enum": [
+              "text",
+              "media"
+            ]
+          },
+          "freezeState": {
+            "type": "boolean"
+          },
+          "endpoint": {
+            "type": "boolean"
+          },
+          "textValidator": {
+            "type": "string",
+            "description": "Must be a valid regular expression"
+          },
+          "item": {
+            "$ref": "#/definitions/itemSchema"
+          }
+        },
+        "additionalProperties": false
+      },
+      "itemSchema": {
+        "oneOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "contextual-menu-request",
+                    "contextual-menu-select",
+                    "contextual-menu-update",
+                    "credential-issuance",
+                    "credential-request",
+                    "credential-reception",
+                    "identity-proof-request",
+                    "identity-proof-result",
+                    "identity-proof-submit",
+                    "media",
+                    "menu-display",
+                    "menu-select",
+                    "receipts",
+                    "text",
+                    "invitation",
+                    "profile",
+                    "terminate-connection"
+                  ]
+                }
+              },
+              "additionalProperties": true
+            },
+            "minItems": 1
+          }
+        ]
+      },
+      "valueSchema": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "required": [
+              "url",
+              "attributes"
+            ],
+            "properties": {
+              "url": {
+                "type": "string"
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "version",
+              "attributes"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              },
+              "attributes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "label",
+              "imageUrl",
+              "did"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "invitation"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "imageUrl": {
+                "type": "string"
+              },
+              "did": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  }
