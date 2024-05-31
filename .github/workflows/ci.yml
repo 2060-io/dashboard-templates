@@ -17,19 +17,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Checkout external repo
-        uses: actions/checkout@v2
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
         with:
-          repository: 2060-io/fastbot-conversational-dts
-          path: './templates/config'
+          name: schemas
+          path: 2060-io/fastbot-conversational-dts
 
       - name: Procesar archivos YAML
         run: |
-          ls templates/
-          ls templates/config/
+          unzip schemas/schemas.zip
 
-          for file in templates/config/*.json; do
-            echo "Procesando archivo: $file"
+          for file in schemas/*.json; do
+            echo "Processing: $file"
           done
       
       # - id: generate-mapping
