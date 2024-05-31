@@ -1,0 +1,40 @@
+name: Validate YAML
+on:
+  pull_request:
+    branches: [main, dev]
+    types: [opened, synchronize, reopened, labeled]
+    paths:
+      - 'Fastbot/v*/**'
+  push:
+    branches: [main, dev]
+    # paths:
+    #   - 'Fastbot/v*/**'
+  workflow_dispatch:
+
+jobs:
+  validate-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Checkout external repo
+        uses: actions/checkout@v2
+        with:
+          repository: 2060-io/fastbot-conversational-dts
+          path: external_repo
+      
+      - id: generate-mapping
+        run: |
+          mapping=$(jq -n '{}')
+          for vdir in Fastbot/v*; do
+            version=${vdir#Fastbot/}
+            schema_file="schemas-repo/templates/config/schema.$version.json"
+            mapping=$(jq ".\"$schema_file\" = [\"$version/**/*.{yaml,yml}\"]" <<< "$mapping")
+          done
+          echo "mapping=$(printf '%s' "$mapping" | jq -c .)" >> $GITHUB_OUTPUT
+
+      - uses: InoUno/yaml-ls-check@develop
+        with:
+          root: Fastbot/
+          schemaMapping: | 
+            ${{ steps.generate-mapping.outputs.mapping }}
