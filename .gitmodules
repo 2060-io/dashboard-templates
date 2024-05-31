@@ -1,0 +1,3 @@
+[submodule "Fastbot/config"]
+	path = Fastbot/config
+	url = https://github.com/2060-io/fastbot-conversational-schema.git
