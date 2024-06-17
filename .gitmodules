@@ -1,3 +1,4 @@
 [submodule "Fastbot/config"]
 	path = Fastbot/config
 	url = git@github.com:2060-io/fastbot-conversational-schema.git
+	branch = fastbot-1.0
