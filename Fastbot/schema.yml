@@ -1,0 +1,3 @@
+config:
+  path: 2060-io/fastbot-conversational-schema
+  branch: fastbot-1.0
