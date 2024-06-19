@@ -13,18 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
           
-      - name: Install jq
-        run: sudo apt-get install jq
-
       - name: Read schema.yml and fetch file
         id: fetch-file
         run: |
+          sudo apt-get update && sudo apt-get install -y jq
           CONFIG_PATH=$(jq -r '.config.path' Fastbot/schema.yml)
           CONFIG_BRANCH=$(jq -r '.config.branch' Fastbot/schema.yml)
           echo "Path: $CONFIG_PATH"
           echo "Branch: $CONFIG_BRANCH"
           JSON_FILE_URL=`https://raw.githubusercontent.com/${CONFIG_PATH}/${CONFIG_BRANCH}/schema.json`
-          curl -sS $JSON_FILE_URL > temp.json
+          curl -sS "$JSON_FILE_URL" > temp.json
 
       - uses: InoUno/yaml-ls-check@develop
         with:
