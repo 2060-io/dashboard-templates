@@ -33,5 +33,5 @@ jobs:
           root: Fastbot/
           schemaMapping: | 
             {
-              "./temp.json": [ "config.yml" ]
+              "${{ github.workspace }}/temp.json": [ "config.yml" ]
             }
