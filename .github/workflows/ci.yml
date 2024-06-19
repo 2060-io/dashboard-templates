@@ -22,6 +22,7 @@ jobs:
             CONFIG_BRANCH=$(echo "$CONTENT" | jq -r '.config.branch')
             echo "Path: $CONFIG_PATH"
             echo "Branch: $CONFIG_BRANCH"
+            JSON_FILE_URL="https://raw.githubusercontent.com/$CONFIG_PATH/$CONFIG_BRANCH/schema.json"
             echo "URL del archivo schema.json: $JSON_FILE_URL"
             curl -sS "$JSON_FILE_URL" > temp.json || { echo "Error al descargar schema.json"; exit 1; }
 
