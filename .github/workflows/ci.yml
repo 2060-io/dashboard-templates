@@ -3,11 +3,13 @@ on:
   pull_request:
     branches: [main, dev]
     paths:
+      - '..github/**'
       - 'Fastbot/**'
     types: [opened, synchronize, reopened, labeled]
   push:
     branches: [main, dev]
     paths:
+      - '..github/**'
       - 'Fastbot/**'
   workflow_dispatch:
 
