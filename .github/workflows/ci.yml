@@ -17,7 +17,7 @@ jobs:
         id: fetch-file
         run: |
           sudo apt-get install -y jq
-          ls -R
+          jq -r '.config.path' Fastbot/schema.yml
           CONFIG_PATH=$(jq -r '.config.path' Fastbot/schema.yml)
           CONFIG_BRANCH=$(jq -r '.config.branch' Fastbot/schema.yml)
           echo "Path: $CONFIG_PATH"
