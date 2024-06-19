@@ -25,6 +25,8 @@ jobs:
             JSON_FILE_URL="https://raw.githubusercontent.com/$CONFIG_PATH/$CONFIG_BRANCH/schema.json"
             echo "URL del archivo schema.json: $JSON_FILE_URL"
             curl -sS "$JSON_FILE_URL" > temp.json || { echo "Error al descargar schema.json"; exit 1; }
+            pwd
+            ls -l
 
       - uses: InoUno/yaml-ls-check@develop
         with:
