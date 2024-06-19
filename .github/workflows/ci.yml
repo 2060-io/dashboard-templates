@@ -31,5 +31,5 @@ jobs:
           root: Fastbot/
           schemaMapping: | 
             {
-              "temp.json": [ "config.yml" ]
+              "./temp.json": [ "config.yml" ]
             }
