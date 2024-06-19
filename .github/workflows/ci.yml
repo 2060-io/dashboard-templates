@@ -21,7 +21,7 @@ jobs:
           CONFIG_BRANCH=$(jq -r '.config.branch' Fastbot/schema.yml)
           echo "Path: $CONFIG_PATH"
           echo "Branch: $CONFIG_BRANCH"
-          JSON_FILE_URL=`https://raw.githubusercontent.com/${CONFIG_PATH}/${CONFIG_BRANCH}/schema.json`
+          JSON_FILE_URL="https://raw.githubusercontent.com/$CONFIG_PATH/$CONFIG_BRANCH/schema.json"
           curl -sS "$JSON_FILE_URL" > temp.json
 
       - uses: InoUno/yaml-ls-check@develop
