@@ -16,17 +16,14 @@ jobs:
       - name: Read schema.yml and fetch file
         id: fetch-file
         run: |
-            sudo apt-get install jq
-            CONTENT=$(cat Fastbot/schema.yml)
-            echo "$CONTENT" | jq -r '.config.path'
-        # CONFIG_PATH=$(echo "$CONTENT" | jq -r '.config.path')
-        # CONFIG_BRANCH=$(echo "$CONTENT" | jq -r '.config.branch')
-        # sudo apt-get install -y jq
-        # CONTENT=$(cat Fastbot/schema.yml)
-        # echo "Path: $CONFIG_PATH"
-        # echo "Branch: $CONFIG_BRANCH"
-        # JSON_FILE_URL="https://raw.githubusercontent.com/$CONFIG_PATH/$CONFIG_BRANCH/schema.json"
-        # curl -sS "$JSON_FILE_URL" > temp.json
+            sudo apt-get install -y jq
+            CONTENT=$(cat Fastbot/schema_dir.json)
+            CONFIG_PATH=$(echo "$CONTENT" | jq -r '.config.path')
+            CONFIG_BRANCH=$(echo "$CONTENT" | jq -r '.config.branch')
+            echo "Path: $CONFIG_PATH"
+            echo "Branch: $CONFIG_BRANCH"
+            JSON_FILE_URL="https://raw.githubusercontent.com/$CONFIG_PATH/$CONFIG_BRANCH/schema.json"
+            curl -sS "$JSON_FILE_URL" > temp.json
 
       - uses: InoUno/yaml-ls-check@develop
         with:
