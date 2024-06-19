@@ -17,9 +17,9 @@ jobs:
         id: fetch-file
         run: |
           sudo apt-get install -y jq
-          jq -r '.config.path' Fastbot/schema.yml
-          CONFIG_PATH=$(jq -r '.config.path' Fastbot/schema.yml)
-          CONFIG_BRANCH=$(jq -r '.config.branch' Fastbot/schema.yml)
+          CONTENT=$(cat Fastbot/schema.yml)
+          CONFIG_PATH=$(echo "$CONTENT" | jq -r '.config.path')
+          CONFIG_BRANCH=$(echo "$CONTENT" | jq -r '.config.branch')
           echo "Path: $CONFIG_PATH"
           echo "Branch: $CONFIG_BRANCH"
           JSON_FILE_URL="https://raw.githubusercontent.com/$CONFIG_PATH/$CONFIG_BRANCH/schema.json"
