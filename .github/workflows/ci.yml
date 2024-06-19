@@ -16,7 +16,7 @@ jobs:
       - name: Read schema.yml and fetch file
         id: fetch-file
         run: |
-            cat Fastbot/schema.yml
+            CONTENT=$(cat Fastbot/schema.yml)
         # sudo apt-get install -y jq
         # CONTENT=$(cat Fastbot/schema.yml)
         # CONFIG_PATH=$(echo "$CONTENT" | jq -r '.config.path')
