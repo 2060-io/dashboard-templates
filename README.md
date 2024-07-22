@@ -1,6 +1,6 @@
 # Dashboard Templates
 
-This is an open-source project that manages various templates for deploying services on Kubernetes related to the 2060 project ([2060.io](https://2060.io/)). The goal is to facilitate rapid deployment when generating custom chatbots.
+This is a project that manages various templates for deploying services on Kubernetes related to the 2060 project ([2060.io](https://2060.io/)). The goal is to facilitate rapid deployment when generating custom chatbots.
 
 ## Considerations
 
