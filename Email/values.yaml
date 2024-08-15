@@ -1,0 +1,6 @@
+namespace: demos-main
+dtsName: email-service
+agentName: Modern Bank
+dbPWD: password
+emailPWD: password
+replicas: 1

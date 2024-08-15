@@ -4,7 +4,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.namespace }}
   
 ---
 
@@ -13,11 +13,11 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: email-service #dtst:dtsName:1:email-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
-    app: email-service #dtst:dtsName:1:email-service
+    app: {{ .Values.dtsName }}
   ports:
   - name: didcomm
     port: 3001
@@ -44,8 +44,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: email-service-admin #dtst:dtsName:1:email-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}-admin
+  namespace: {{ .Values.namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/whitelist-source-range: "198.50.185.225/32"
@@ -53,17 +53,17 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - a.email-service.demos.dev.2060.io #dtst:dtsName:1:email-service
-      secretName: admin.email-service.demos.dev.2060.io-cert #dtst:dtsName:1:email-service
+        - a.{{ .Values.dtsName }}.demos.dev.2060.io
+      secretName: admin.{{ .Values.dtsName }}.demos.dev.2060.io-cert
   rules:
-    - host: a.email-service.demos.dev.2060.io #dtst:dtsName:1:email-service
+    - host: a.{{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: email-service #dtst:dtsName:1:email-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 3000
 
@@ -75,25 +75,25 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: email-service-public #dtst:dtsName:1:email-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}-public
+  namespace: {{ .Values.namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - email-service.demos.dev.2060.io #dtst:dtsName:1:email-service
-      secretName: public.email-service.demos.dev.2060.io-cert #dtst:dtsName:1:email-service
+        - {{ .Values.dtsName }}.demos.dev.2060.io
+      secretName: public.{{ .Values.dtsName }}.demos.dev.2060.io-cert
   rules:
-    - host: email-service.demos.dev.2060.io #dtst:dtsName:1:email-service
+    - host: {{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: email-service #dtst:dtsName:1:email-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 3001
 
@@ -104,8 +104,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: email-service-ds #dtst:dtsName:1:email-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}-ds
+  namespace: {{ .Values.namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/whitelist-source-range: "51.79.89.27/32"
@@ -113,17 +113,17 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - q.email-service.demos.dev.2060.io #dtst:dtsName:1:email-service
-      secretName: ds-email-service.demos.dev.2060.io-cert #dtst:dtsName:1:email-service
+        - q.{{ .Values.dtsName }}.demos.dev.2060.io
+      secretName: ds-{{ .Values.dtsName }}.demos.dev.2060.io-cert
   rules:
-    - host: q.email-service.demos.dev.2060.io #dtst:dtsName:1:email-service
+    - host: q.{{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: email-service #dtst:dtsName:1:email-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 2903
 
@@ -134,55 +134,55 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-   name: email-service #dtst:dtsName:1:email-service
-   namespace: demos-main #dtst:namespace:10:demos-main
+   name: {{ .Values.dtsName }}
+   namespace: {{ .Values.namespace }}
    labels:
       app: nginx
 spec:
-   serviceName: "email-service" #dtst:dtsName::email-service
-   replicas: 1 #dtst:replicas:0:1
+   serviceName: "{{ .Values.dtsName }}"
+   replicas: {{ .Values.replicas }}
    selector:
       matchLabels:
-         app: email-service #dtst:dtsName::email-service
+         app: {{ .Values.dtsName }}
    template:
       metadata:
          labels:
-            app: email-service #dtst:dtsName::email-service
+            app: {{ .Values.dtsName }}
       spec:
          containers:
-         -  name: email-service-sa-container #dtst:dtsName::email-service
+         -  name: {{ .Values.dtsName }}-sa-container
             image: io2060/2060-service-agent:main
             imagePullPolicy: Always
             env:
             - name: AGENT_ENDPOINT
-              value: "wss://email-service.demos.dev.2060.io:443" #dtst:dtsName:1:email-service
+              value: "wss://{{ .Values.dtsName }}.demos.dev.2060.io:443"
             - name: AGENT_NAME
-              value: "Modern Bank" #dtst:agentName:2:Modern Bank
+              value: {{ .Values.agentName }}
             - name: AGENT_INVITATION_IMAGE_URL
-              value: "https://i.email-service.demos.dev.2060.io/avatar.png" #dtst:dtsName:1:email-service
+              value: "https://i.{{ .Values.dtsName }}.demos.dev.2060.io/avatar.png"
             - name: EVENTS_BASE_URL
               value: "http://localhost:2903"
             - name: AGENT_PUBLIC_DID
-              value: "did:web:email-service.demos.dev.2060.io" #dtst:dtsName:1:email-service
+              value: "did:web:{{ .Values.dtsName }}.demos.dev.2060.io"
             - name: ANONCREDS_SERVICE_BASE_URL
-              value: "https://email-service.demos.dev.2060.io" #dtst:dtsName:1:email-service
+              value: "https://{{ .Values.dtsName }}.demos.dev.2060.io"
               
             volumeMounts:
-            - name: email-service-sa-pv-main #dtst:dtsName:1:email-service
+            - name: {{ .Values.dtsName }}-sa-pv-main
               mountPath: /root/.afj
             ports:
             -  containerPort: 3000
             -  containerPort: 3001
-         -  name: email-service-backend-container #dtst:dtsName:1:email-service
+         -  name: {{ .Values.dtsName }}-backend-container
             image: io2060/2060-demos-email-verification-service:main
             imagePullPolicy: Always
             env:
             - name: SERVICE_AGENT_ADMIN_BASE_URL
               value: "http://localhost:3000"
             - name: PUBLIC_BASE_URL
-              value: "https://email-service.demos.dev.2060.io" #dtst:dtsName:1:email-service
+              value: "https://{{ .Values.dtsName }}.demos.dev.2060.io"
             - name: PNVS_SERVICE_AGENT_ADMIN_BASE_URL
-              value: "https://a.email-service.demos.dev.2060.io" #dtst:dtsName:1:email-service
+              value: "https://a.{{ .Values.dtsName }}.demos.dev.2060.io"
             - name: DEBUG
               value: "1"
             - name: QUARKUS_HTTP_PORT
@@ -202,11 +202,11 @@ spec:
             - name: IO_TWENTYSIXTY_EMAILVS_SENDMAIL_SMTP_USERNAME
               value: "root@gmail.com"
             - name: IO_TWENTYSIXTY_EMAILVS_SENDMAIL_SMTP_PASSWORD
-              value: "password" #dtst:emailPWD:1:password
+              value: {{ .Values.emailPWD }}
             - name: QUARKUS_DATASOURCE_USERNAME
               value: "emailvs" 
             - name: QUARKUS_DATASOURCE_PASSWORD
-              value: "password" #dtst:dbPWD:1:password
+              value: {{ .Values.dbPWD }}
             ports:
             -  containerPort: 2903
          -  name: postgres
@@ -214,7 +214,7 @@ spec:
             imagePullPolicy: Always
             env:
             - name: POSTGRES_PASSWORD
-              value: "password" #dtst:dbPWD:1:password
+              value: {{ .Values.dbPWD }}
             - name: POSTGRES_USER
               value: "emailvs"
             - name: PGDATA
@@ -222,11 +222,11 @@ spec:
             ports:
             -  containerPort: 5432
             volumeMounts:
-            - name: email-service-pg-pv-main #dtst:dtsName::email-service
+            - name: {{ .Values.dtsName }}-pg-pv-main
               mountPath: /var/lib/postgresql/data
    volumeClaimTemplates:
    - metadata:
-       name: email-service-sa-pv-main #dtst:dtsName::email-service
+       name: {{ .Values.dtsName }}-sa-pv-main
      spec:
        storageClassName: csi-cinder-classic
        accessModes:
@@ -235,7 +235,7 @@ spec:
          requests:
            storage: 1Gi
    - metadata:
-       name: email-service-pg-pv-main #dtst:dtsName::email-service
+       name: {{ .Values.dtsName }}-pg-pv-main
      spec:
        storageClassName: csi-cinder-classic
        accessModes:
