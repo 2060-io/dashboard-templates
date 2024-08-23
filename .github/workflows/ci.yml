@@ -23,18 +23,18 @@ jobs:
         id: fetch-file
         run: |
             sudo apt-get install -y jq
-            CONTENT=$(cat Fastbot/schema_dir.json)
+            CONTENT=$(cat Fastbot/Setup/schema_dir.json)
             CONFIG_PATH=$(echo "$CONTENT" | jq -r '.config.path')
             CONFIG_BRANCH=$(echo "$CONTENT" | jq -r '.config.branch')
             echo "Path: $CONFIG_PATH"
             echo "Branch: $CONFIG_BRANCH"
             JSON_FILE_URL="https://raw.githubusercontent.com/$CONFIG_PATH/$CONFIG_BRANCH/schema.json"
             echo "URL del archivo schema.json: $JSON_FILE_URL"
-            curl -sS "$JSON_FILE_URL" > temp.json || { echo "Error al descargar schema.json"; exit 1; }
+            curl -sS "$JSON_FILE_URL" > Setup/temp.json || { echo "Error al descargar schema.json"; exit 1; }
 
       - uses: InoUno/yaml-ls-check@develop
         with:
-          root: Fastbot/
+          root: Fastbot/Setup/
           schemaMapping: | 
             {
               "${{ github.workspace }}/temp.json": [ "config.yml" ]
