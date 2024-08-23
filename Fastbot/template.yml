@@ -1,10 +1,9 @@
-#   dtst:name of variable in orchestrator:priority in variable form:what to replace
 # Namespace
 
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.namespace }}
   
 ---
 
@@ -13,11 +12,11 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: fastbot-service #dtst:dtsName:1:fastbot-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
-    app: fastbot-service #dtst:dtsName::fastbot-service
+    app: {{ .Values.dtsName }}
   ports:
   - name: didcomm
     port: 3001
@@ -65,8 +64,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: fastbot-service-admin #dtst:dtsName:1:fastbot-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}-admin
+  namespace: {{ .Values.namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/whitelist-source-range: "198.50.185.225/32"
@@ -74,17 +73,17 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - a.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
-      secretName: admin.fastbot-service.demos.dev.2060.io-cert #dtst:dtsName:1:fastbot-service
+        - a.{{ .Values.dtsName }}.demos.dev.2060.io
+      secretName: admin.{{ .Values.dtsName }}.demos.dev.2060.io-cert
   rules:
-    - host: a.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+    - host: a.{{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 3000
 
@@ -96,36 +95,36 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: fastbot-service-public #dtst:dtsName:1:fastbot-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}-public
+  namespace: {{ .Values.namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
-        - i.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
-      secretName: public.fastbot-service.demos.dev.2060.io-cert #dtst:dtsName:1:fastbot-service
+        - {{ .Values.dtsName }}.demos.dev.2060.io
+        - i.{{ .Values.dtsName }}.demos.dev.2060.io
+      secretName: public.{{ .Values.dtsName }}.demos.dev.2060.io-cert
   rules:
-    - host: fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+    - host: {{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 3001
-    - host: i.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+    - host: i.{{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 80
 
@@ -136,8 +135,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: fastbot-service-ds #dtst:dtsName:1:fastbot-service
-  namespace: demos-main #dtst:namespace:10:demos-main
+  name: {{ .Values.dtsName }}-ds
+  namespace: {{ .Values.namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/whitelist-source-range: "51.79.89.27/32"
@@ -145,28 +144,28 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - q.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
-        - d.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
-      secretName: ds-fastbot-service.demos.dev.2060.io-cert #dtst:dtsName:1:fastbot-service
+        - q.{{ .Values.dtsName }}.demos.dev.2060.io
+        - d.{{ .Values.dtsName }}.demos.dev.2060.io
+      secretName: ds-{{ .Values.dtsName }}.demos.dev.2060.io-cert
   rules:
-    - host: q.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+    - host: q.{{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 2903
-    - host: d.fastbot-service.demos.dev.2060.io #dtst:dtsName:1:fastbot-service
+    - host: d.{{ .Values.dtsName }}.demos.dev.2060.io
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                 name: fastbot-service #dtst:dtsName:1:fastbot-service
+                 name: {{ .Values.dtsName }}
                  port:
                    number: 2904
 
@@ -177,61 +176,61 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-   name: fastbot-service #dtst:dtsName:1:fastbot-service
-   namespace: demos-main #dtst:namespace:10:demos-main
+   name: {{ .Values.dtsName }}
+   namespace: {{ .Values.namespace }}
    labels:
       app: nginx
 spec:
-   serviceName: "fastbot-service" #dtst:dtsName::fastbot-service
-   replicas: 1 #dtst:replicas:0:1
+   serviceName: "{{ .Values.dtsName }}"
+   replicas: {{ .Values.replicas }}
    selector:
       matchLabels:
-         app: fastbot-service #dtst:dtsName::fastbot-service
+         app: {{ .Values.dtsName }}
    template:
       metadata:
          labels:
-            app: fastbot-service #dtst:dtsName::fastbot-service
+            app: {{ .Values.dtsName }}
       spec:
          initContainers:
          - name: volume-gid-ds
            image: busybox
            command: ["sh", "-c", "chown -R 185:0 /home/data"]
            volumeMounts:
-           - name: fastbot-service-data-store-main #dtst:dtsName::fastbot-service
+           - name: {{ .Values.dtsName }}-data-store-main
              mountPath: /home/data
          containers:
-         -  name: fastbot-service-sa-container #dtst:dtsName::fastbot-service
+         -  name: {{ .Values.dtsName }}-sa-container
             image: io2060/2060-service-agent:dev
             imagePullPolicy: Always
             env:
             - name: AGENT_ENDPOINT
-              value: "wss://fastbot-service.demos.dev.2060.io:443" #dtst:dtsName:1:fastbot-service
-            - name: AGENT_NAME
-              value: "Modern Bank" #dtst:agentName:2:Modern Bank
+              value: "wss://{{ .Values.dtsName }}.demos.dev.2060.io:443"
+            - name: AGENT_LABEL
+              value: {{ .Values.agentName }}
             - name: AGENT_INVITATION_IMAGE_URL
-              value: "https://i.fastbot-service.demos.dev.2060.io/avatar.png" #dtst:dtsName:1:fastbot-service
+              value: "https://i.{{ .Values.dtsName }}.demos.dev.2060.io/avatar.png"
             - name: EVENTS_BASE_URL
               value: "http://localhost:2903"
             - name: AGENT_PUBLIC_DID
-              value: "did:web:fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+              value: "did:web:{{ .Values.dtsName }}.demos.dev.2060.io"
             - name: ANONCREDS_SERVICE_BASE_URL
-              value: "https://fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+              value: "https://{{ .Values.dtsName }}.demos.dev.2060.io"
             volumeMounts:
-            - name: fastbot-service-sa-pv-main #dtst:dtsName:1:fastbot-service
+            - name: {{ .Values.dtsName }}-sa-pv-main
               mountPath: /root/.afj
             ports:
             -  containerPort: 3000
             -  containerPort: 3001
-         -  name: fastbot-service-backend-container #dtst:dtsName:1:fastbot-service
+         -  name: {{ .Values.dtsName }}-backend-container
             image: io2060/fastbot-conversational-dts:dev
             imagePullPolicy: Always
             env:
             - name: SERVICE_AGENT_ADMIN_BASE_URL
               value: "http://localhost:3000"
             - name: PUBLIC_BASE_URL
-              value: "https://fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+              value: "https://{{ .Values.dtsName }}.demos.dev.2060.io"
             - name: PNVS_SERVICE_AGENT_ADMIN_BASE_URL
-              value: "https://a.fastbot-service.demos.dev.2060.io" #dtst:dtsName:1:fastbot-service
+              value: "https://a.{{ .Values.dtsName }}.demos.dev.2060.io"
             - name: DEBUG
               value: "1"
             - name: QUARKUS_HTTP_PORT
@@ -243,40 +242,40 @@ spec:
             - name: COM_MOBIERA_CHATAPP_FASTBOT_RES_C_MEDIARESOURCE_MP_REST_URL
               value: "http://localhost:2904"
             - name: COM_MOBIERA_CHATAPP_FASTBOT_RES_C_MEDIARESOURCE_MP_REST_ENABLED
-              value: "false" #dtst:dtsMediaSt:1:false
+              value: {{ .Values.dtsMediaSt }}
             - name: QUARKUS_SWAGGER_UI_ALWAYS_INCLUDE
               value: "1"
             - name: COM_MOBIERA_CHATAPP_FASTBOT_LANGUAGE
-              value: "en" #dtst:language:1:en
+              value: {{ .Values.language }}
             - name: COM_MOBIERA_CHATAPP_FASTBOT_JMS_QUEUE_ID
-              value: "fastbot" #dtst:queue:1:fastbot
+              value: {{ .Values.queue }}
             - name: QUARKUS_DATASOURCE_JDBC_URL
               value: jdbc:postgresql://localhost/easychat
             - name: QUARKUS_DATASOURCE_USERNAME
               value: "easychat" 
             - name: QUARKUS_DATASOURCE_PASSWORD
-              value: "password" #dtst:dbPWD:1:password
+              value: {{ .Values.dbPWD }}
             - name: QUARKUS_ARTEMIS_USERNAME
               value: "quarkus" 
             - name: QUARKUS_ARTEMIS_PASSWORD
-              value: "password" #dtst:quarkusPWD:1:password
+              value: {{ .Values.quarkusPWD }}
             - name: IO_TWENTYSIXTY_DTS_ENTITY_ID
-              value: "6902dc8e-8d57-4506-8cf8-cf1fd527809c" #dtst:dtsId:1:6902dc8e-8d57-4506-8cf8-cf1fd527809c
+              value: {{ .Values.dtsId }}
             - name: QUARKUS_ARTEMIS_URL
               value: "tcp://artemis-broker-hdls-svc.activemq-artemis-operator:61616"
             - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_REGISTERRESOURCE_MP_REST_URL
-              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+              value: {{ .Values.orchestratorUrl }}
             - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_PARAMETERRESOURCE_MP_REST_URL
-              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+              value: {{ .Values.orchestratorUrl }}
             - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_DTSRESOURCE_MP_REST_URL
-              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+              value: {{ .Values.orchestratorUrl }}
             - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_CAMPAIGNRESOURCE_MP_REST_URL
-              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+              value: {{ .Values.orchestratorUrl }}
             - name: IO_TWENTYSIXTY_ORCHESTRATOR_RES_C_CAMPAIGNSCHEDULERESOURCE_MP_REST_URL
-              value: "http://localhost:2601/" #dtst:orchestratorUrl:1:http://localhost:2601/
+              value: {{ .Values.orchestratorUrl }}
             ports:
             -  containerPort: 2903
-         -  name: fastbot-service-data-store-container #dtst:dtsName::fastbot-service
+         -  name: {{ .Values.dtsName }}-data-store-container
             image: io2060/2060-datastore:main
             imagePullPolicy: Always
             env:
@@ -297,14 +296,14 @@ spec:
             ports:
             -  containerPort: 2904
             volumeMounts:
-            - name: fastbot-service-data-store-main #dtst:dtsName::fastbot-service
+            - name: {{ .Values.dtsName }}-data-store-main
               mountPath: /home/data
          -  name: postgres
             image: postgres:15.2
             imagePullPolicy: Always
             env:
             - name: POSTGRES_PASSWORD
-              value: "password" #dtst:dbPWD:1:password
+              value: {{ .Values.dbPWD }}
             - name: POSTGRES_USER
               value: "easychat"
             - name: PGDATA
@@ -312,11 +311,11 @@ spec:
             ports:
             -  containerPort: 5432
             volumeMounts:
-            - name: fastbot-service-pg-pv-main #dtst:dtsName::fastbot-service
+            - name: {{ .Values.dtsName }}-pg-pv-main
               mountPath: /var/lib/postgresql/data
    volumeClaimTemplates:
    - metadata:
-       name: fastbot-service-sa-pv-main #dtst:dtsName::fastbot-service
+       name: {{ .Values.dtsName }}-sa-pv-main
      spec:
        storageClassName: csi-cinder-classic
        accessModes:
@@ -325,7 +324,7 @@ spec:
          requests:
            storage: 1Gi
    - metadata:
-       name: fastbot-service-pg-pv-main #dtst:dtsName::fastbot-service
+       name: {{ .Values.dtsName }}-pg-pv-main
      spec:
        storageClassName: csi-cinder-classic
        accessModes:
@@ -334,7 +333,7 @@ spec:
          requests:
            storage: 1Gi
    - metadata:
-       name: fastbot-service-data-store-main #dtst:dtsName::fastbot-service
+       name: {{ .Values.dtsName }}-data-store-main
      spec:
        storageClassName: csi-cinder-classic
        accessModes:

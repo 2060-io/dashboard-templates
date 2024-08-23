@@ -1,0 +1,11 @@
+namespace: demos-main
+dtsName: fastbot-service
+agentName: Modern Bank
+dtsMediaSt: false
+language: en
+queue: fastbot
+dbPWD: password
+quarkusPWD: password
+dtsId: 6902dc8e-8d57-4506-8cf8-cf1fd527809c
+orchestratorUrl: http://localhost:2601/
+replicas: 1
